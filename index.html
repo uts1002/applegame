@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>사과게임 - Apple Game</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="game-container">
+      <div class="game-header">
+        <div class="game-header-content">
+          <div class="score-display">
+            <span class="label">점수</span>
+            <span id="score">0</span>
+          </div>
+          <div class="timer-display">
+            <span class="label">시간</span>
+            <span id="timer">60</span>
+          </div>
+          <div class="combo-display-header">
+            <span class="label">콤보</span>
+            <span id="combo">0</span>
+          </div>
+        </div>
+        <button id="startBtn" class="start-btn">게임 시작</button>
+      </div>
+
+      <div class="timer-bar-container">
+        <div class="timer-bar-full">
+          <div id="timerProgress" class="timer-progress"></div>
+        </div>
+        <div class="timer-text">남은 시간</div>
+      </div>
+
+      <div class="skills-container">
+        <button
+          id="hintBtn"
+          class="skill-btn"
+          onclick="window.gameInstance.useHint()"
+        >
+          <span class="skill-icon">💡</span>
+          <span class="skill-text">힌트</span>
+          <span id="hintCount" class="skill-count">3</span>
+        </button>
+        <button
+          id="timeStopBtn"
+          class="skill-btn"
+          onclick="window.gameInstance.useTimeStop()"
+        >
+          <span class="skill-icon">⏸️</span>
+          <span class="skill-text">시간정지</span>
+          <span id="timeStopCount" class="skill-count">1</span>
+        </button>
+        <button
+          id="shuffleBtn"
+          class="skill-btn"
+          onclick="window.gameInstance.useMagicShuffle()"
+        >
+          <span class="skill-icon">🎲</span>
+          <span class="skill-text">셔플</span>
+          <span id="shuffleCount" class="skill-count">2</span>
+        </button>
+      </div>
+
+      <div class="game-board-container">
+        <canvas id="gameCanvas"></canvas>
+        <div id="selectionBox" class="selection-box"></div>
+      </div>
+
+      <div class="apple-legend">
+        <h3>🍎 특별 사과 가이드 (색상으로 구분)</h3>
+        <div class="legend-grid">
+          <div class="legend-item">
+            <span class="legend-apple normal"></span>
+            <span class="legend-text">일반 사과 (10점)</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-apple golden"></span>
+            <span class="legend-text">황금 사과 (2배 점수)</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-apple time"></span>
+            <span class="legend-text">시간 사과 (+5초)</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-apple wild"></span>
+            <span class="legend-text">와일드 사과 (모든 수)</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-apple bomb"></span>
+            <span class="legend-text">폭탄 사과 (주변 파괴)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="game-info">
+        <p>
+          🍎 드래그하여 사과를 선택하세요! 합이 10이 되면 사과가 사라집니다!
+        </p>
+      </div>
+    </div>
+
+    <script src="game.js"></script>
+  </body>
+</html>

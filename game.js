@@ -50,11 +50,11 @@ class AppleGame {
         
         if (isMobile) {
             // Fixed mobile dimensions
-            this.APPLE_SPACING = 30;
-            this.APPLE_SIZE = 24;
+            this.APPLE_SPACING = 26;
+            this.APPLE_SIZE = 20;
             
-            const width = this.COLS * this.APPLE_SPACING + 40; // 340px
-            const height = this.ROWS * this.APPLE_SPACING + 40; // 550px
+            const width = this.COLS * this.APPLE_SPACING + 40; // 300px
+            const height = this.ROWS * this.APPLE_SPACING + 40; // 482px
             
             this.canvas.width = width;
             this.canvas.height = height;
@@ -121,9 +121,41 @@ class AppleGame {
         const startBtn = document.getElementById('startBtn');
         startBtn.addEventListener('click', () => this.startGame());
         
+        // Mouse events
         this.canvas.addEventListener('mousedown', (e) => this.onMouseDown(e));
         this.canvas.addEventListener('mousemove', (e) => this.onMouseMove(e));
         this.canvas.addEventListener('mouseup', (e) => this.onMouseUp(e));
+        
+        // Touch events for mobile
+        this.canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            this.onMouseDown({
+                clientX: touch.clientX,
+                clientY: touch.clientY,
+                preventDefault: () => {},
+                type: 'touchstart'
+            });
+        }, { passive: false });
+        
+        this.canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            this.onMouseMove({
+                clientX: touch.clientX,
+                clientY: touch.clientY,
+                preventDefault: () => {},
+                type: 'touchmove'
+            });
+        }, { passive: false });
+        
+        this.canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            this.onMouseUp({
+                preventDefault: () => {},
+                type: 'touchend'
+            });
+        }, { passive: false });
         
         // Prevent context menu
         this.canvas.addEventListener('contextmenu', (e) => e.preventDefault());

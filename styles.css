@@ -34,6 +34,12 @@ body {
     color: white;
 }
 
+.game-header-content {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+
 .score-display, .timer-display {
     display: flex;
     flex-direction: column;

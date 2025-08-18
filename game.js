@@ -50,11 +50,11 @@ class AppleGame {
         
         if (isMobile) {
             // Fixed mobile dimensions
-            this.APPLE_SPACING = 26;
-            this.APPLE_SIZE = 20;
+            this.APPLE_SPACING = 28;
+            this.APPLE_SIZE = 18;
             
-            const width = this.COLS * this.APPLE_SPACING + 40; // 300px
-            const height = this.ROWS * this.APPLE_SPACING + 40; // 482px
+            const width = this.COLS * this.APPLE_SPACING + 40; // 320px
+            const height = this.ROWS * this.APPLE_SPACING + 40; // 516px
             
             this.canvas.width = width;
             this.canvas.height = height;
@@ -1132,7 +1132,12 @@ class AppleGame {
         if (apple.type !== 'wild') {
             this.ctx.fillStyle = apple.selected ? '#000' : '#fff';
             this.ctx.strokeStyle = apple.selected ? '#fff' : '#000';
-            this.ctx.font = 'bold 18px Arial';
+            
+            // Adjust font size based on device
+            const isMobile = window.innerWidth <= 768;
+            const fontSize = isMobile ? 12 : 18;
+            this.ctx.font = `bold ${fontSize}px Arial`;
+            
             this.ctx.lineWidth = 3;
             this.ctx.textAlign = 'center';
             this.ctx.textBaseline = 'middle';

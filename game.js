@@ -50,34 +50,42 @@ class AppleGame {
     }
     
     initCanvas() {
-        // Mobile-specific dimensions
+        // Determine if mobile based on viewport
         const isMobile = window.innerWidth <= 768;
         
+        // Fixed spacing and sizes for consistent gameplay
         if (isMobile) {
-            // Fixed mobile dimensions
+            // Mobile: Smaller apples, tighter spacing
             this.APPLE_SPACING = 28;
-            this.APPLE_SIZE = 18;
-            
-            const width = this.COLS * this.APPLE_SPACING + 40; // 320px
-            const height = this.ROWS * this.APPLE_SPACING + 40; // 516px
-            
-            this.canvas.width = width;
-            this.canvas.height = height;
-            this.canvas.style.width = width + 'px';
-            this.canvas.style.height = height + 'px';
+            this.APPLE_SIZE = 24;
         } else {
-            // Desktop dimensions
+            // Desktop: Larger apples, normal spacing  
             this.APPLE_SPACING = 38;
             this.APPLE_SIZE = 32;
-            
-            const width = this.COLS * this.APPLE_SPACING + 40; // 420px
-            const height = this.ROWS * this.APPLE_SPACING + 40; // 686px
-            
-            this.canvas.width = width;
-            this.canvas.height = height;
-            this.canvas.style.width = width + 'px';
-            this.canvas.style.height = height + 'px';
         }
+        
+        // Calculate canvas dimensions based on grid
+        const canvasWidth = this.COLS * this.APPLE_SPACING + 40;
+        const canvasHeight = this.ROWS * this.APPLE_SPACING + 40;
+        
+        // Set canvas internal resolution
+        this.canvas.width = canvasWidth;
+        this.canvas.height = canvasHeight;
+        
+        // Get container width to scale canvas display size
+        const container = this.canvas.parentElement;
+        const containerWidth = container.clientWidth;
+        
+        // Calculate scale to fit container while maintaining aspect ratio
+        const maxDisplayWidth = Math.min(containerWidth * 0.95, 600);
+        const scale = Math.min(maxDisplayWidth / canvasWidth, 1);
+        
+        // Set display size while maintaining aspect ratio
+        this.canvas.style.width = (canvasWidth * scale) + 'px';
+        this.canvas.style.height = (canvasHeight * scale) + 'px';
+        
+        // Store scale for mouse position calculations
+        this.displayScale = scale;
     }
     
     loadImages() {
@@ -105,6 +113,17 @@ class AppleGame {
             for (let col = 0; col < this.COLS; col++) {
                 const appleData = this.generateApple(col, row);
                 this.board[row][col] = appleData;
+            }
+        }
+    }
+    
+    updateApplePositions() {
+        // Update apple positions when canvas is resized
+        for (let row = 0; row < this.ROWS; row++) {
+            for (let col = 0; col < this.COLS; col++) {
+                const apple = this.board[row][col];
+                apple.x = col * this.APPLE_SPACING + 20;
+                apple.y = row * this.APPLE_SPACING + 20;
             }
         }
     }
@@ -148,6 +167,13 @@ class AppleGame {
         this.canvas.addEventListener('mousedown', (e) => this.onMouseDown(e));
         this.canvas.addEventListener('mousemove', (e) => this.onMouseMove(e));
         this.canvas.addEventListener('mouseup', (e) => this.onMouseUp(e));
+        
+        // Window resize event for responsive canvas
+        window.addEventListener('resize', () => {
+            this.initCanvas();
+            this.updateApplePositions();
+            this.render();
+        });
         
         // Touch events for mobile
         this.canvas.addEventListener('touchstart', (e) => {
@@ -232,7 +258,7 @@ class AppleGame {
         
         gameOverDiv.innerHTML = `
             <div class="game-over-content">
-                <h2>🍎 게임 끝! 🍎</h2>
+                <h2>🍮 게임 끝! 🍮</h2>
                 <div class="final-stats">
                     <div class="stat-item">
                         <span class="stat-label">최종 점수</span>
@@ -286,7 +312,7 @@ class AppleGame {
             ctx.fillStyle = '#2c3e50';
             ctx.font = 'bold 32px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText('🍎 사과게임 결과 🍎', 200, 60);
+            ctx.fillText('🍮 젤리게임 결과 🍮', 200, 60);
             
             // 통계 박스
             ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
@@ -384,9 +410,12 @@ class AppleGame {
     
     getMousePos(e) {
         const rect = this.canvas.getBoundingClientRect();
+        const scaleX = this.canvas.width / rect.width;
+        const scaleY = this.canvas.height / rect.height;
+        
         return {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top
+            x: (e.clientX - rect.left) * scaleX,
+            y: (e.clientY - rect.top) * scaleY
         };
     }
     
@@ -436,11 +465,15 @@ class AppleGame {
         const containerRect = container.getBoundingClientRect();
         const canvasRect = this.canvas.getBoundingClientRect();
         
+        // Apply scale to convert from canvas coordinates to display coordinates
+        const scaleX = canvasRect.width / this.canvas.width;
+        const scaleY = canvasRect.height / this.canvas.height;
+        
         this.selectionBox.style.display = 'block';
-        this.selectionBox.style.left = (canvasRect.left - containerRect.left + left) + 'px';
-        this.selectionBox.style.top = (canvasRect.top - containerRect.top + top) + 'px';
-        this.selectionBox.style.width = width + 'px';
-        this.selectionBox.style.height = height + 'px';
+        this.selectionBox.style.left = (canvasRect.left - containerRect.left + left * scaleX) + 'px';
+        this.selectionBox.style.top = (canvasRect.top - containerRect.top + top * scaleY) + 'px';
+        this.selectionBox.style.width = (width * scaleX) + 'px';
+        this.selectionBox.style.height = (height * scaleY) + 'px';
     }
     
     updateSelectedApples() {
@@ -1088,8 +1121,26 @@ class AppleGame {
                 this.ctx.shadowColor = '#00ff00';
             }
             
-            // Draw image centered
-            this.ctx.drawImage(img, apple.x, apple.y, this.APPLE_SIZE, this.APPLE_SIZE);
+            // Draw image centered with aspect ratio maintained
+            // Use the original image's aspect ratio
+            const aspectRatio = img.width / img.height;
+            let drawWidth = this.APPLE_SIZE;
+            let drawHeight = this.APPLE_SIZE;
+            
+            // Maintain aspect ratio
+            if (aspectRatio > 1) {
+                // Image is wider than tall
+                drawHeight = this.APPLE_SIZE / aspectRatio;
+            } else {
+                // Image is taller than wide
+                drawWidth = this.APPLE_SIZE * aspectRatio;
+            }
+            
+            // Center the image
+            const offsetX = (this.APPLE_SIZE - drawWidth) / 2;
+            const offsetY = (this.APPLE_SIZE - drawHeight) / 2;
+            
+            this.ctx.drawImage(img, apple.x + offsetX, apple.y + offsetY, drawWidth, drawHeight);
             
             // Reset shadow
             this.ctx.shadowBlur = 0;

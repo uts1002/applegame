@@ -38,9 +38,11 @@ body {
     display: flex;
     gap: 30px;
     align-items: center;
+    justify-content: center;
+    flex: 1;
 }
 
-.score-display, .timer-display {
+.score-display, .timer-display, .combo-display-header {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -136,6 +138,8 @@ body {
     touch-action: none; /* Prevents default touch behaviors like scrolling */
     -webkit-touch-callout: none; /* Disables iOS callout */
     -webkit-tap-highlight-color: transparent; /* Removes tap highlight */
+    max-width: 100%;
+    height: auto;
 }
 
 .selection-box {
@@ -851,52 +855,11 @@ body {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-.legend-apple {
+.legend-apple-img {
     width: 35px;
     height: 35px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 14px;
-    color: #2c3e50;
-    border: 2px solid;
-    border-radius: 50%;
+    object-fit: contain;
     flex-shrink: 0;
-}
-
-.legend-apple.normal {
-    background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
-    border-color: #e55039;
-}
-
-.legend-apple.golden {
-    background: linear-gradient(135deg, #ffd700 0%, #ffb347 100%);
-    border-color: #f39c12;
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
-}
-
-.legend-apple.time {
-    background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
-    border-color: #2980b9;
-    box-shadow: 0 0 10px rgba(116, 185, 255, 0.4);
-}
-
-.legend-apple.wild {
-    background: linear-gradient(135deg, 
-        #ff0000 0%, #ff8000 14%, #ffff00 28%, 
-        #00ff00 42%, #0080ff 57%, #8000ff 71%, 
-        #ff00ff 85%, #ff0000 100%);
-    border-color: #666;
-    box-shadow: 0 0 12px rgba(255, 102, 0, 0.6);
-}
-
-.legend-apple.bomb {
-    background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
-    border-color: #d63031;
-    box-shadow: 0 0 10px rgba(253, 121, 168, 0.4);
-    border-radius: 0;
-    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
 }
 
 .legend-text {

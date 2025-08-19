@@ -11,6 +11,10 @@ class AppleGame {
         this.APPLE_SPACING = 38;
         this.GAME_TIME = 60;
         
+        // Apple images
+        this.appleImages = {};
+        this.imagesLoaded = false;
+        
         // Game state
         this.board = [];
         this.score = 0;
@@ -38,6 +42,7 @@ class AppleGame {
         this.selectedApples = new Set();
         
         this.initCanvas();
+        this.loadImages();
         this.bindEvents();
         this.initBoard();
         this.render();
@@ -73,6 +78,24 @@ class AppleGame {
             this.canvas.style.width = width + 'px';
             this.canvas.style.height = height + 'px';
         }
+    }
+    
+    loadImages() {
+        const imageTypes = ['normal', 'golden', 'time', 'wild', 'bomb'];
+        let loadedCount = 0;
+        
+        imageTypes.forEach(type => {
+            const img = new Image();
+            img.onload = () => {
+                loadedCount++;
+                if (loadedCount === imageTypes.length) {
+                    this.imagesLoaded = true;
+                    this.render(); // Re-render when all images are loaded
+                }
+            };
+            img.src = `apple-${type}.png`;
+            this.appleImages[type] = img;
+        });
     }
     
     initBoard() {
@@ -1013,6 +1036,8 @@ class AppleGame {
     }
     
     drawApple(apple, row, col) {
+        if (!this.imagesLoaded) return; // Wait until images are loaded
+        
         const centerX = apple.x + this.APPLE_SIZE / 2;
         const centerY = apple.y + this.APPLE_SIZE / 2;
         
@@ -1051,94 +1076,36 @@ class AppleGame {
             }
         }
         
-        // Apple body - different colors for special types
-        if (apple.hint) {
-            this.ctx.fillStyle = '#00ff00';
-            this.ctx.strokeStyle = '#00cc00';
-            this.ctx.shadowBlur = 15;
-            this.ctx.shadowColor = '#00ff00';
-        } else if (apple.selected) {
-            this.ctx.fillStyle = '#ffd700';
-            this.ctx.strokeStyle = '#ffb347';
-            this.ctx.shadowBlur = 10;
-            this.ctx.shadowColor = '#ffd700';
-        } else if (apple.type === 'golden') {
-            this.ctx.fillStyle = '#ffd700';
-            this.ctx.strokeStyle = '#ff8c00';
-            this.ctx.shadowBlur = 8;
-            this.ctx.shadowColor = '#ffd700';
-        } else if (apple.type === 'time') {
-            this.ctx.fillStyle = '#74b9ff';
-            this.ctx.strokeStyle = '#0984e3';
-            this.ctx.shadowBlur = 6;
-            this.ctx.shadowColor = '#74b9ff';
-        } else if (apple.type === 'wild') {
-            // Create rainbow gradient for wild apple
-            const gradient = this.ctx.createLinearGradient(
-                centerX - 14, centerY - 16, 
-                centerX + 14, centerY + 16
-            );
-            gradient.addColorStop(0, '#ff0000');    // Red
-            gradient.addColorStop(0.17, '#ff8000'); // Orange
-            gradient.addColorStop(0.33, '#ffff00'); // Yellow
-            gradient.addColorStop(0.5, '#00ff00');  // Green
-            gradient.addColorStop(0.67, '#0080ff'); // Blue
-            gradient.addColorStop(0.83, '#8000ff'); // Indigo
-            gradient.addColorStop(1, '#ff00ff');    // Violet
+        // Draw apple image
+        const img = this.appleImages[apple.type];
+        if (img && img.complete) {
+            // Add special effects for selected or hint apples
+            if (apple.selected) {
+                this.ctx.shadowBlur = 10;
+                this.ctx.shadowColor = '#ffd700';
+            } else if (apple.hint) {
+                this.ctx.shadowBlur = 15;
+                this.ctx.shadowColor = '#00ff00';
+            }
             
-            this.ctx.fillStyle = gradient;
-            this.ctx.strokeStyle = '#666';
-            this.ctx.shadowBlur = 8;
-            this.ctx.shadowColor = '#ff6600';
-        } else if (apple.type === 'bomb') {
-            this.ctx.fillStyle = '#fd79a8';
-            this.ctx.strokeStyle = '#e84393';
-            this.ctx.shadowBlur = 6;
-            this.ctx.shadowColor = '#fd79a8';
-        } else {
-            this.ctx.fillStyle = '#ff6b6b';
-            this.ctx.strokeStyle = '#e55039';
-        }
-        
-        this.ctx.lineWidth = 2;
-        
-        // Draw shape based on apple type
-        if (apple.type === 'bomb') {
-            // Draw thick star shape for bomb apples
-            this.drawStar(centerX, centerY, 5, 18, 10); // 5 points, outer radius 18, inner radius 10
-            this.ctx.fill();
-            this.ctx.stroke();
-        } else {
-            // Draw apple shape (smaller circle) for all other apples
-            this.ctx.beginPath();
-            this.ctx.ellipse(centerX, centerY, 14, 16, 0, 0, Math.PI * 2);
-            this.ctx.fill();
-            this.ctx.stroke();
-        }
-        
-        // Apple stem and leaf (only for non-bomb apples)
-        if (apple.type !== 'bomb') {
-            this.ctx.fillStyle = '#2d5016';
-            this.ctx.fillRect(centerX - 1.5, apple.y + 3, 3, 6);
+            // Draw image centered
+            this.ctx.drawImage(img, apple.x, apple.y, this.APPLE_SIZE, this.APPLE_SIZE);
             
-            // Apple leaf (smaller)
-            this.ctx.fillStyle = '#2d5016';
-            this.ctx.beginPath();
-            this.ctx.ellipse(centerX + 4, apple.y + 6, 2, 4, Math.PI / 4, 0, Math.PI * 2);
-            this.ctx.fill();
+            // Reset shadow
+            this.ctx.shadowBlur = 0;
         }
         
-        // Number (larger and bolder for better visibility) - but not for wild apples
+        // Number overlay (only for non-wild apples)
         if (apple.type !== 'wild') {
-            this.ctx.fillStyle = apple.selected ? '#000' : '#fff';
-            this.ctx.strokeStyle = apple.selected ? '#fff' : '#000';
+            this.ctx.fillStyle = apple.selected ? '#ffd700' : '#fff';
+            this.ctx.strokeStyle = '#000';
             
             // Adjust font size based on device
             const isMobile = window.innerWidth <= 768;
-            const fontSize = isMobile ? 12 : 18;
+            const fontSize = isMobile ? 10 : 16;
             this.ctx.font = `bold ${fontSize}px Arial`;
             
-            this.ctx.lineWidth = 3;
+            this.ctx.lineWidth = 2;
             this.ctx.textAlign = 'center';
             this.ctx.textBaseline = 'middle';
             this.ctx.strokeText(apple.value, centerX, centerY);

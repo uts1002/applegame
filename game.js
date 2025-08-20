@@ -286,11 +286,24 @@ class AppleGame {
                 </div>
                 <div class="action-buttons">
                     <button class="share-btn" onclick="window.gameInstance.shareResult()">📤 공유하기</button>
-                    <button class="restart-btn" onclick="location.reload()">🔄 다시 시작</button>
+                    <button class="restart-btn" onclick="window.gameInstance.restartGame()">🔄 다시 시작</button>
                 </div>
             </div>
         `;
         document.body.appendChild(gameOverDiv);
+    }
+
+    restartGame() {
+        // 모바일에서 전면광고 표시
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile && typeof showInterstitialAd === 'function') {
+            showInterstitialAd();
+        }
+        
+        // 약간의 지연 후 페이지 새로고침 (광고 로드 시간 확보)
+        setTimeout(() => {
+            location.reload();
+        }, 100);
     }
     
     async shareResult() {

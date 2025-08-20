@@ -135,6 +135,51 @@
       </div>
     </div>
 
+    <!-- 전면광고 스크립트 (모바일 전용) -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3555455805580193"
+         crossorigin="anonymous"></script>
+
     <script src="game.js"></script>
+    
+    <script>
+      // 전면광고 함수 (모바일에서만 실행)
+      function showInterstitialAd() {
+        // 개발환경 체크 (file:// 프로토콜이면 광고 스킵)
+        if (location.protocol === 'file:') {
+          console.log('개발환경에서는 광고가 표시되지 않습니다.');
+          return;
+        }
+        
+        // 모바일 기기인지 확인
+        const isMobile = window.innerWidth <= 768;
+        
+        if (isMobile && window.adsbygoogle) {
+          try {
+            // 전면광고 표시
+            (adsbygoogle = window.adsbygoogle || []).push({
+              google_ad_client: "ca-pub-3555455805580193",
+              enable_page_level_ads: true
+            });
+            console.log('모바일 전면광고 요청됨');
+          } catch (e) {
+            console.log('광고 로드 실패:', e);
+          }
+        } else if (!isMobile) {
+          console.log('데스크톱에서는 전면광고가 표시되지 않습니다.');
+        }
+      }
+      
+      // 사이드바 광고 에러 방지
+      window.addEventListener('load', function() {
+        if (location.protocol === 'file:') {
+          // 개발환경에서는 사이드바 광고 숨김
+          const sidebarAds = document.querySelectorAll('.sidebar-ad');
+          sidebarAds.forEach(ad => {
+            ad.style.display = 'none';
+          });
+          console.log('개발환경: 사이드바 광고 숨김');
+        }
+      });
+    </script>
   </body>
 </html>

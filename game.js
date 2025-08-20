@@ -68,9 +68,12 @@ class AppleGame {
         const canvasWidth = this.COLS * this.APPLE_SPACING + 40;
         const canvasHeight = this.ROWS * this.APPLE_SPACING + 40;
         
-        // Set canvas internal resolution
-        this.canvas.width = canvasWidth;
-        this.canvas.height = canvasHeight;
+        // Get device pixel ratio for high-DPI displays
+        const devicePixelRatio = window.devicePixelRatio || 1;
+        
+        // Set canvas internal resolution (scaled for high-DPI)
+        this.canvas.width = canvasWidth * devicePixelRatio;
+        this.canvas.height = canvasHeight * devicePixelRatio;
         
         // Get container width to scale canvas display size
         const container = this.canvas.parentElement;
@@ -84,8 +87,12 @@ class AppleGame {
         this.canvas.style.width = (canvasWidth * scale) + 'px';
         this.canvas.style.height = (canvasHeight * scale) + 'px';
         
+        // Scale the context to match device pixel ratio
+        this.ctx.scale(devicePixelRatio, devicePixelRatio);
+        
         // Store scale for mouse position calculations
         this.displayScale = scale;
+        this.devicePixelRatio = devicePixelRatio;
     }
     
     loadImages() {

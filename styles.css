@@ -12,6 +12,7 @@ body {
     justify-content: center;
     align-items: center;
     padding: 20px;
+    position: relative;
 }
 
 .game-container {
@@ -866,6 +867,60 @@ body {
     font-size: 14px;
     color: #495057;
     font-weight: 500;
+}
+
+/* Main wrapper for game and ads */
+.main-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 20px;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Sidebar Ads (Desktop Only) */
+.sidebar-ad {
+    display: none;
+    width: 160px;
+    min-height: 600px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 20px;
+}
+
+/* Show sidebar ads only on desktop screens */
+@media (min-width: 1280px) {
+    .sidebar-ad {
+        display: block;
+    }
+    
+    .game-container {
+        max-width: 900px;
+        flex-shrink: 0;
+    }
+}
+
+/* Hide ads on smaller screens */
+@media (max-width: 1279px) {
+    .main-wrapper {
+        justify-content: center;
+    }
+    
+    .sidebar-ad {
+        display: none;
+    }
+}
+
+/* Ensure ads are responsive */
+.sidebar-ad .adsbygoogle {
+    width: 100%;
+    height: auto;
+    min-height: 250px;
 }
 
 /* Mobile Responsive Updates */
